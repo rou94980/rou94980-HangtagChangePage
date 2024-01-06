@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hang Tag 產生器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+  </head>
+  <style>
+    h1 {
+      color: #4caf50;
+    }
+    h1,
+    p {
+      text-align: center;
+    }
+    .box {
+      margin: 100px auto;
+      width: fit-content;
+      display: flex;
+      flex-direction: column;
+    }
+    #downloadbtn {
+      margin: 50px auto;
+      background-color: #4caf50; /* Green */
+      border: none;
+      border-radius: 30px;
+      color: white;
+      padding: 15px 32px;
+      font-size: 16px;
+    }
+    #downloadbtn:hover {
+      background-color: white;
+      border: 2px solid #4caf5099;
+      color: #4caf50;
+    }
+  </style>
+  <body>
+    <h1>Hang Tag 產生器</h1>
+    <p>提示：僅限上傳.xlsx, .xls檔案格式，匯入檔案欄位必須與範例檔案相同</p>
+    <div class="box">
+      <label for=""
+        >上傳檔案: <input type="file" id="upload" accept=".xlsx, .xls"
+      /></label>
+      <button id="downloadbtn">產生並下載</button>
+    </div>
+
+    <script>
+      (function () {
+        //處理上傳檔案
+        const uploadInput = document.getElementById("upload");
+        const hangtagsample = document.getElementById("hangtagsample");
+        const downloadbtn = document.getElementById("downloadbtn");
+        downloadbtn.addEventListener("click", handleFileUpload);
+
+        //處理上傳檔案
+        function handleFileUpload() {
+          const file = uploadInput.files[0];
+          if (file) {
+            const buffer = new FileReader();
+            buffer.readAsArrayBuffer(file);
+            buffer.onload = (e) => {
+              loadTable(buffer.result);
+            };
+          } else {
+            alert("未選擇文件");
+          }
+        }
+
+        async function loadTable(buffer) {
+          //處理匯入檔案
+          const importWorkbook = new ExcelJS.Workbook();
+          await importWorkbook.xlsx.load(buffer);
+          const importworksheet = importWorkbook.getWorksheet("Dodgeville");
+
+          //處理hangtag範本
+          const SamplefilePath = "./hangtagSample.xlsx"; // 指定 Excel 檔案的相對路徑
+          try {
+            const res = await fetch(SamplefilePath);
+            if (!res) {
+              throw new Error(`Failed to fetch the file: ${res.statusText}`);
+            }
+            const samplebuffer = await res.arrayBuffer();
+            const exportWorkbook = new ExcelJS.Workbook();
+            await exportWorkbook.xlsx.load(samplebuffer);
+            exportWorkbook.views = [
+              {
+                backgroundColor: {
+                  argb: "FFFF9966", // 將十六進制的顏色碼放在引號內
+                },
+              },
+            ];
+
+            //創建模板工作表
+            const sampleworksheet =
+              exportWorkbook.getWorksheet("SampleWorksheet");
+
+            //讀取有幾個款式, 分別產生獨立工作表
+            let dataCount = importworksheet.rowCount;
+            for (let i = 6; i <= dataCount; i++) {
+              //工作表命名，使用Style_ColorCode_Size
+              let worksheetName =
+                String(importworksheet.getCell(`F${i}`).value) +
+                "_" +
+                String(
+                  decodeURIComponent(importworksheet.getCell(`L${i}`).value)
+                );
+              //創建新工作表
+              let exportworksheet = exportWorkbook.addWorksheet(worksheetName);
+              exportworksheet.model = Object.assign({}, sampleworksheet.model);
+              exportworksheet.name = worksheetName;
+              //處理合併表格，待優化
+              exportworksheet.mergeCells("A1", "C2");
+
+              //複製樣式
+              // exportworksheet.eachRow(function (row, rowNumber) {
+              //   row.eachCell(function (cell, colNumber) {
+              //     if (cell.type === ExcelJS.ValueType.Merge) {
+              //       let master = sampleworksheet.getCell(cell.master.address);
+              //       let range = sampleworksheet.getCell(cell.address);
+              //       range.value = master.value;
+              //       range.style = Object.assign({}, master.style);
+              //       range.merge(master);
+              //     }
+              //   });
+              // });
+
+              //刪除模板檔案中的多餘欄位，待優化
+              exportworksheet.spliceColumns(4, 2);
+
+              //放入值
+              //Date
+              exportworksheet.getCell("B4").value = importworksheet.getCell(
+                `A${i}`
+              ).value;
+              //Season
+              exportworksheet.getCell("B5").value = importworksheet.getCell(
+                `B${i}`
+              ).value;
+              //Vendor
+              exportworksheet.getCell("B6").value = importworksheet.getCell(
+                `C${i}`
+              ).value;
+              //Country
+              exportworksheet.getCell("B7").value = importworksheet.getCell(
+                `D${i}`
+              ).value;
+              //Style
+              exportworksheet.getCell("B8").value = importworksheet.getCell(
+                `F${i}`
+              ).value;
+              //StyleName
+              exportworksheet.getCell("B9").value = importworksheet.getCell(
+                `G${i}`
+              ).value;
+              //ColorName
+              exportworksheet.getCell("B10").value = importworksheet.getCell(
+                `K${i}`
+              ).value;
+              //ColorCode
+              exportworksheet.getCell("B11").value = importworksheet.getCell(
+                `L${i}`
+              ).value;
+              //Size
+              exportworksheet.getCell("B12").value = importworksheet.getCell(
+                `H${i}`
+              ).value;
+
+              let copycount = importworksheet.getCell(`N${i}`).value;
+              for (let j = 0; j < copycount; j++) {
+                copyColumns(exportworksheet, 1, 3);
+              }
+            }
+
+            const content = await exportWorkbook.xlsx.writeBuffer();
+            downloadExcelFile(content, "測試的試算表.xlsx");
+          } catch (error) {
+            console.error(error);
+          }
+        }
+
+        //複製吊卡
+        async function copyColumns(
+          sourceSheet,
+          destinationStartCol,
+          destinationEndCol
+        ) {
+          // 複製每一行的內容、樣式，包括合併的儲存格
+          sourceSheet.eachRow(
+            { includeEmpty: true },
+            (sourceRow, rowNumber) => {
+              sourceRow.eachCell(
+                { includeEmpty: true },
+                (sourceCell, colNumber) => {
+                  const destinationCol =
+                    colNumber + (destinationEndCol - destinationStartCol + 1);
+                  const destinationCell = sourceSheet.getCell(
+                    rowNumber,
+                    destinationCol
+                  );
+
+                  // 複製單元格內容
+                  destinationCell.value = sourceCell.value;
+
+                  // 複製單元格樣式
+                  const sourceStyle = sourceCell.style;
+                  destinationCell.style = Object.assign({}, sourceStyle);
+                }
+              );
+            }
+          );
+
+          // 複製每一列的高度
+          sourceSheet.eachRow((sourceRow, rowNumber) => {
+            const sourceRowHeight = sourceRow.height;
+            sourceSheet.getRow(rowNumber).height = sourceRowHeight;
+          });
+
+          // 複製每一列的寬度
+          for (
+            let colNumber = 1;
+            colNumber <= sourceSheet.columnCount;
+            colNumber++
+          ) {
+            const sourceColWidth = sourceSheet.getColumn(colNumber).width;
+            sourceSheet.getColumn(
+              colNumber + (destinationEndCol - destinationStartCol + 1)
+            ).width = sourceColWidth;
+          }
+        }
+
+        // 下載 Excel 檔案
+        function downloadExcelFile(content, fileName) {
+          const blobData = new Blob([content], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blobData);
+          link.download = fileName;
+          link.click();
+        }
+      })();
+    </script>
+  </body>
+</html>
