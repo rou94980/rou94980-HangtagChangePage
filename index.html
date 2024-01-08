@@ -104,7 +104,9 @@
                 "_" +
                 String(
                   decodeURIComponent(importworksheet.getCell(`L${i}`).value)
-                );
+                ) +
+                "_" +
+                String(i);
               //創建新工作表
               let exportworksheet = exportWorkbook.addWorksheet(worksheetName);
               exportworksheet.model = Object.assign({}, sampleworksheet.model);
