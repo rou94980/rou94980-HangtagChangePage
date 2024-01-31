@@ -84,13 +84,6 @@
             const samplebuffer = await res.arrayBuffer();
             const exportWorkbook = new ExcelJS.Workbook();
             await exportWorkbook.xlsx.load(samplebuffer);
-            exportWorkbook.views = [
-              {
-                backgroundColor: {
-                  argb: "FFFF9966",
-                },
-              },
-            ];
 
             //創建模板工作表
             const sampleworksheet =
@@ -114,7 +107,6 @@
               exportworksheet.model = Object.assign({}, sampleworksheet.model);
               exportworksheet.name = worksheetName;
               //處理合併表格及框線及尺寸
-              exportworksheet.pageSetup.paperSize = 70;
               exportworksheet.mergeCells("A1", "C2");
               exportworksheet.getCell("A1").border = {
                 top: { style: "medium" },
@@ -194,14 +186,11 @@
               }
             }
             exportWorkbook.removeWorksheet("SampleWorksheet");
+            worksheet.pageSetup.printArea = "A1:C38";
             var today = new Date();
-
-            // 獲取年、月、日
             var year = today.getFullYear();
-            var month = today.getMonth() + 1; // 月份從0開始，所以要加1
+            var month = today.getMonth() + 1;
             var day = today.getDate();
-
-            // 將日期格式化為字符串（例如：YYYY-MM-DD）
             var formattedDate =
               year +
               (month < 10 ? "0" : "") +
