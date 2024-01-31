@@ -113,10 +113,15 @@
               let exportworksheet = exportWorkbook.addWorksheet(worksheetName);
               exportworksheet.model = Object.assign({}, sampleworksheet.model);
               exportworksheet.name = worksheetName;
-              //處理合併表格，待優化
+              //處理合併表格及框線及尺寸
+              exportworksheet.pageSetup.paperSize = 70;
               exportworksheet.mergeCells("A1", "C2");
-              mergedCell = exportworksheet.getCell("A1");
-              mergedCell.border = { right: { style: "medium" } };
+              exportworksheet.getCell("A1").border = {
+                top: { style: "medium" },
+                left: { style: "medium" },
+                right: { style: "medium" },
+              };
+              // };
               //放入值
               //Date
               exportworksheet.getCell("B4").value = importworksheet.getCell(
@@ -173,6 +178,19 @@
                 let copyworksheet = exportWorkbook.addWorksheet(copysheetName);
                 copyworksheet.model = Object.assign({}, exportworksheet.model);
                 copyworksheet.name = copysheetName;
+                copyworksheet.pageSetup.paperSize = 70;
+                copyworksheet.mergeCells("A1", "C2");
+                // copyworksheet.getCell("A1").border = {
+                //   top: { style: "medium" },
+                //   left: { style: "medium" },
+                //   right: { style: "medium" },
+                // };
+                // copyworksheet.getCell("A36").border = {
+                //   left: { style: "medium" },
+                // };
+                // copyworksheet.getCell("A37").border = {
+                //   left: { style: "medium" },
+                // };
               }
             }
             exportWorkbook.removeWorksheet("SampleWorksheet");
