@@ -106,6 +106,7 @@
               let exportworksheet = exportWorkbook.addWorksheet(worksheetName);
               exportworksheet.model = Object.assign({}, sampleworksheet.model);
               exportworksheet.name = worksheetName;
+              exportworksheet.pageSetup.printArea = "A1:C38";
               //處理合併表格及框線及尺寸
               exportworksheet.mergeCells("A1", "C2");
               exportworksheet.getCell("A1").border = {
@@ -172,6 +173,7 @@
                 copyworksheet.name = copysheetName;
                 copyworksheet.pageSetup.paperSize = 70;
                 copyworksheet.mergeCells("A1", "C2");
+                copyworksheet.pageSetup.printArea = "A1:C38";
                 // copyworksheet.getCell("A1").border = {
                 //   top: { style: "medium" },
                 //   left: { style: "medium" },
@@ -186,7 +188,6 @@
               }
             }
             exportWorkbook.removeWorksheet("SampleWorksheet");
-            worksheet.pageSetup.printArea = "A1:C38";
             var today = new Date();
             var year = today.getFullYear();
             var month = today.getMonth() + 1;
