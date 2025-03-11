@@ -124,6 +124,10 @@
               exportworksheet.getCell("B12").value = importworksheet.getCell(
                 `H${i}`
               ).value;
+              //Sample Type
+              exportworksheet.getCell("B14").value = importworksheet.getCell(
+                `M${i}`
+              ).value;
 
               let copycount = importworksheet.getCell(`N${i}`).value;
               for (let j = 1; j <= copycount - 1; j++) {
