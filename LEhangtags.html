@@ -78,13 +78,13 @@
               let exportworksheet = exportWorkbook.addWorksheet(worksheetName);
               exportworksheet.model = Object.assign({}, sampleworksheet.model);
               exportworksheet.views = [{ state: "normal" }];
+              delete exportworksheet.pageSetup.scale;
               exportworksheet.name = worksheetName;
               exportworksheet.pageSetup.printArea = "A1:C34";
               exportworksheet.pageSetup = {
                 printArea: "A1:C34",
                 fitToWidth: 1, // 自動縮放到 1 頁寬
                 fitToHeight: 1, // 自動縮放到 1 頁高
-                scale: undefined, // 確保不被手動縮放比例影響
                 paperSize: 9, // 設定 A4 紙張大小 (9 = A4, 1 = Letter)
               };
               //處理合併表格及框線及尺寸
@@ -155,6 +155,7 @@
                 let copyworksheet = exportWorkbook.addWorksheet(copysheetName);
                 copyworksheet.model = Object.assign({}, exportworksheet.model);
                 copyworksheet.views = [{ state: "normal" }];
+                delete copyworksheet.pageSetup.scale;
                 copyworksheet.name = copysheetName;
                 //copyworksheet.pageSetup.paperSize = 70;
                 copyworksheet.pageSetup.printArea = "A1:C34";
@@ -162,7 +163,6 @@
                   printArea: "A1:C34",
                   fitToWidth: 1, // 自動縮放到 1 頁寬
                   fitToHeight: 1, // 自動縮放到 1 頁高
-                  scale: undefined, // 確保不被手動縮放比例影響
                   paperSize: 9, // 設定 A4 紙張大小 (9 = A4, 1 = Letter)
                 };
                 copyworksheet.mergeCells("A1", "C2");
