@@ -78,7 +78,11 @@
               let exportworksheet = exportWorkbook.addWorksheet(worksheetName);
               exportworksheet.model = Object.assign({}, sampleworksheet.model);
               exportworksheet.name = worksheetName;
-              exportworksheet.pageSetup.printArea = "A1:C38";
+              exportworksheet.pageSetup.printArea = "A1:C34";
+              exportworksheet.pageSetup = {
+                fitToWidth: 1, // 調整為 1 頁寬
+                fitToHeight: 1, // 調整為 1 頁高
+              };
               //處理合併表格及框線及尺寸
               exportworksheet.mergeCells("A1", "C2");
               exportworksheet.getCell("A1").border = {
@@ -147,9 +151,13 @@
                 let copyworksheet = exportWorkbook.addWorksheet(copysheetName);
                 copyworksheet.model = Object.assign({}, exportworksheet.model);
                 copyworksheet.name = copysheetName;
-                copyworksheet.pageSetup.paperSize = 70;
+                //copyworksheet.pageSetup.paperSize = 70;
+                copyworksheet.pageSetup.printArea = "A1:C34";
+                copyworksheet.pageSetup = {
+                  fitToWidth: 1, // 調整為 1 頁寬
+                  fitToHeight: 1, // 調整為 1 頁高
+                };
                 copyworksheet.mergeCells("A1", "C2");
-                copyworksheet.pageSetup.printArea = "A1:C38";
                 // copyworksheet.getCell("A1").border = {
                 //   top: { style: "medium" },
                 //   left: { style: "medium" },

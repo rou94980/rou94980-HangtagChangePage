@@ -170,7 +170,11 @@
                 let copyworksheet = exportWorkbook.addWorksheet(copysheetName);
                 copyworksheet.model = Object.assign({}, exportworksheet.model);
                 copyworksheet.name = copysheetName;
-                copyworksheet.pageSetup.paperSize = 70;
+                //copyworksheet.pageSetup.paperSize = 70;
+                copyworksheet.pageSetup = {
+                  fitToWidth: 1, // 調整為 1 頁寬
+                  fitToHeight: 1, // 調整為 1 頁高
+                };
                 copyworksheet.mergeCells("A1", "C2");
                 copyworksheet.pageSetup.printArea = "A1:E33";
                 // copyworksheet.getCell("A1").border = {
