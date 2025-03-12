@@ -77,11 +77,15 @@
               //創建新工作表
               let exportworksheet = exportWorkbook.addWorksheet(worksheetName);
               exportworksheet.model = Object.assign({}, sampleworksheet.model);
+              exportworksheet.views = [{ state: "normal" }];
               exportworksheet.name = worksheetName;
               exportworksheet.pageSetup.printArea = "A1:C34";
               exportworksheet.pageSetup = {
-                fitToWidth: 1, // 調整為 1 頁寬
-                fitToHeight: 1, // 調整為 1 頁高
+                printArea: "A1:C34",
+                fitToWidth: 1, // 自動縮放到 1 頁寬
+                fitToHeight: 1, // 自動縮放到 1 頁高
+                scale: undefined, // 確保不被手動縮放比例影響
+                paperSize: 9, // 設定 A4 紙張大小 (9 = A4, 1 = Letter)
               };
               //處理合併表格及框線及尺寸
               exportworksheet.mergeCells("A1", "C2");
@@ -129,7 +133,7 @@
                 `H${i}`
               ).value;
               //Sample Type
-              exportworksheet.getCell("B14").value = importworksheet.getCell(
+              exportworksheet.getCell("B13").value = importworksheet.getCell(
                 `M${i}`
               ).value;
 
@@ -150,12 +154,16 @@
                 //創建新工作表
                 let copyworksheet = exportWorkbook.addWorksheet(copysheetName);
                 copyworksheet.model = Object.assign({}, exportworksheet.model);
+                copyworksheet.views = [{ state: "normal" }];
                 copyworksheet.name = copysheetName;
                 //copyworksheet.pageSetup.paperSize = 70;
                 copyworksheet.pageSetup.printArea = "A1:C34";
                 copyworksheet.pageSetup = {
-                  fitToWidth: 1, // 調整為 1 頁寬
-                  fitToHeight: 1, // 調整為 1 頁高
+                  printArea: "A1:C34",
+                  fitToWidth: 1, // 自動縮放到 1 頁寬
+                  fitToHeight: 1, // 自動縮放到 1 頁高
+                  scale: undefined, // 確保不被手動縮放比例影響
+                  paperSize: 9, // 設定 A4 紙張大小 (9 = A4, 1 = Letter)
                 };
                 copyworksheet.mergeCells("A1", "C2");
                 // copyworksheet.getCell("A1").border = {
